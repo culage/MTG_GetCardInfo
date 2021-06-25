@@ -4,11 +4,12 @@
   "description": "",
   "main": "GetCardInfo.js",
   "dependencies": {
-    "request": "^2.88.2"
+    "jsdom": "^16.6.0",
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node server.js"
+    "start": "start \"\" \"http://localhost:8080/\" & node server.js"
   },
   "author": "",
   "license": "ISC"

@@ -40,6 +40,7 @@ node.jsでは？
 	→できる。
 	https://qiita.com/obukoh/items/aea41eeff66ee82e633b
 	https://blog.katsubemakito.net/nodejs/request
+	https://qiita.com/ritukiii/items/8173ff98f31c2f76b39a
 	
 	WhisperのAPIをラップしたものを作る
 	・パラメータはそのまま渡す
