@@ -1,0 +1,15 @@
+{
+  "name": "mtg_name_to_detail",
+  "version": "1.0.0",
+  "description": "",
+  "main": "GetCardInfo.js",
+  "dependencies": {
+    "request": "^2.88.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
