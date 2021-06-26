@@ -10,16 +10,13 @@ server.on('request', async function(req, res) {
 		res.end(indexHtml);
 		return;
 	}
-	if (req.url.startsWith("/get_card_list?name=")) {
+	if (req.url.startsWith("/get_card?q=")) {
 		console.log(req.url);
-		var encEame = req.url.match(/(?<=name=).*/)[0];
-		var cards = await whisper.GetCardList(encEame);
-		res.writeHead(200,{'Content-Type':'text/html'});
-		res.end(`<html lang="ja"><head><meta charset="utf-8" /></head><body>${cards.map(i=>i.name).join("<br>")}</body></html>`);
+		var encEame = req.url.match(/(?<=q=).*/)[0];
+		var ret = await whisper.GetCard(encEame);
+		res.writeHead(200,{'Content-Type':'application/json'});
+		res.end(JSON.stringify(ret));
 		return;
-	}
-	if (req.url.startsWith("/get_card_info?url=")) {
-		// ★
 	}
 	res.writeHead(200,{'Content-Type':'text/html'});
 	res.end("404 not found.");
