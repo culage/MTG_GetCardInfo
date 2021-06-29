@@ -4,7 +4,6 @@
 <meta charset="utf-8" />
 <title>MTGカード名to詳細</title>
 <style></style>
-<!-- <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> -->
 <script src="./lib/vue.min.js"></script>
 </head>
 <body>
@@ -14,23 +13,107 @@
 <h1>MTGカード名to詳細</h1>
 
 <h2>追加カード入力</h2>
-<input id="txtCardName" type="text">
-<button id="btnAdd">追加</button>
+<textarea style="width:50em; height:5em;" v-model="searchTarget"></textarea><br>
+<button id="btnAdd" @click="search()">検索</button>
 
 <h2>候補表示エリア</h2>
+<div style="border:1px solid red;" v-for="kouhoGrp in kouhoGrpList">
+  <h3 @click="delKouhoGrp(kouhoGrp)">{{ kouhoGrp.base }}</h3>
+  <ul>
+    <li v-for="kouho in kouhoGrp.list" @click="selKouho(kouhoGrp, kouho)">{{ kouho.name }}</li>
+  </ul>
+</div>
 
 <h2>一覧</h2>
-{{ test }}
+<div>合計: {{ deckAllNum }} 枚</div>
+<table border=1>
+  <tr>
+    <th>&nbsp;<!-- DEL Button --></th>
+    <th>枚数</th>
+    <th v-for="col in cols" @click="sort(col.name)">{{ col.disp }}</th>
+  </tr>
+  <tr v-for="card in deck">
+    <td><button @click="delCard(card)">DEL</button></td>
+    <td><input type="text" style="width:2em;text-align:right;" v-model.number="card.num"></td>
+    <td v-for="col in cols">{{ card[col.name] }}</td>
+  </tr>
+</table>
 
 </div>
 
 <script>
-new Vue({
+var vue_app = new Vue({
   el: '#vue_app',
-  data: () => ({
-    test: "test",
-  }),
-});
+  data() { return {
+    searchTarget: "",
+    kouhoGrpList: [], // {num, base, list:[kouhoObj, kouhoObj]}
+    cols: [
+      {name:"name"  , disp:"カード名"  },
+      {name:"cost"  , disp:"コスト"    },
+      {name:"rarity", disp:"レアリティ"},
+      {name:"set"   , disp:"セット"    },
+    ],
+    currSort: {col:"", asc:true},
+    deck: [], // { num, name, cost, rarity, set }
+  }; },
+  computed: {
+    deckAllNum() {
+      return this.deck.reduce((sum, card) => sum + (!isNaN(card.num) ? card.num : 0), 0);
+    }
+  },
+  methods: {
+    async search() {
+      // ★複数追加
+      var num, name;
+      var matches = this.searchTarget.match(/([0-9]+) +(.*)/);
+      if (matches != null) {
+        num  = Number(matches[1]);
+        name = matches[2];
+      } else {
+        num  = 0;
+        name = this.searchTarget;
+      }
+      
+      var result = await this.getCard(name);
+      if (result.type == "detail") {
+        // デッキ追加
+        this.deck.push({num, ...result.detail});
+      } else {
+        // 候補追加
+        var kouhoGrp = {num, base:name, list:result.cards};
+        this.kouhoGrpList.push(kouhoGrp);
+      }
+    },
+    async getCard(name) {
+      var response = await fetch("/get_card?q=" + encodeURIComponent(name));
+      return await response.json();
+    },
+    delKouhoGrp(kouhoGrp) {
+      this.kouhoGrpList = this.kouhoGrpList.filter(i => i !== kouhoGrp);
+    },
+    async selKouho(kouhoGrp, kouho) {
+      // ★部分一致するカード名の場合もあるので、URLから取るようにする必要あり
+      var result = await this.getCard( kouho.name.replace(/ \/\/ .*/, "") );
+      if (result.type != "detail") {
+        alert("err"); console.log(result);
+        return;
+      }
+      this.deck.push({num:kouhoGrp.num, ...result.detail});
+      this.delKouhoGrp(kouhoGrp);
+    },
+    delCard(card) {
+      this.deck = this.deck.filter(i => i !== card);
+    },
+    sort(col) {
+      if (col != this.currSort.col) {
+        this.currSort = {col, asc:true};
+      } else {
+        this.currSort.asc = !this.currSort.asc;
+      }
+      this.deck = this.deck.sort((i1, i2) => this.currSort.asc ? i1[col] > i2[col] : i1[col] < i2[col]);
+    },
+  },
+})
 </script>
 
 </body>
