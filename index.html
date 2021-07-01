@@ -34,12 +34,12 @@
       <tr>
         <th class="dc">&nbsp;<!-- DEL Button --></th>
         <th class="dc">枚数</th>
-        <th class="dc" v-for="col in cols" @click="sort(col.name)">{{ col.disp }}</th>
+        <th class="dc" v-for="col in cols" @click="sort(col.sortKey)">{{ col.disp }}</th>
       </tr>
-      <tr v-for="card in deck">
+      <tr v-for="card in dispDeck">
         <td class="lc"><button @click="delCard(card)">DEL</button></td>
         <td class="lc"><input type="text" style="width:2em;text-align:right;" v-model.number="card.num"></td>
-        <td class="lc" v-for="col in cols" @click="cardInfoHtml = card.html;">{{ card[col.name] }}</td>
+        <td class="lc" v-for="col in cols" @click="cardInfoHtml = card.html;" v-html="card[col.name]"></td>
       </tr>
     </table>
     
@@ -123,10 +123,10 @@ var vue_app = new Vue({
     progress: null,
     kouhoGrpList: [], // {num, base, list:[kouhoObj, kouhoObj]}
     cols: [
-      {name:"name"  , disp:"カード名"  },
-      {name:"cost"  , disp:"コスト"    },
-      {name:"rarity", disp:"レアリティ"},
-      {name:"set"   , disp:"セット"    },
+      {name:"dispName", disp:"カード名"  , sortKey:"name"  },
+      {name:"dispCost", disp:"コスト"    , sortKey:"cost"  },
+      {name:"rarity"  , disp:"レアリティ", sortKey:"rarity"},
+      {name:"set"     , disp:"セット"    , sortKey:"set"   },
     ],
     currSort: {col:"", asc:true},
     deck: [], // { num, name, cost, rarity, set }
@@ -135,7 +135,14 @@ var vue_app = new Vue({
   computed: {
     deckAllNum() {
       return this.deck.reduce((sum, card) => sum + (!isNaN(card.num) ? card.num : 0), 0);
-    }
+    },
+    dispDeck() {
+      return this.deck.map(i => ({
+        dispName:i.name.replace(" // ", " // <br>"),
+        dispCost:i.cost.replace(" // ", " // <br>"),
+        ...i
+      }));
+    },
   },
   methods: {
     parseSearchTarget(text) {
