@@ -19,12 +19,14 @@
     <textarea style="width:30em; height:5em;" v-model="searchTarget"></textarea><br>
     <button id="btnAdd" @click="search()" :disabled="progress">{{ progress ?? "検索" }}</button>
     
-    <h2>候補表示エリア</h2>
-    <div v-for="kouhoGrp in kouhoGrpList">
-      <h3 @click="delKouhoGrp(kouhoGrp)">{{ kouhoGrp.base }}</h3>
-      <ul>
-        <li v-for="kouho in kouhoGrp.list" @click="selKouho(kouhoGrp, kouho)" @mouseover="cardInfoHtml = kouho.html;">{{ kouho.name }}</li>
-      </ul>
+    <div v-if="kouhoGrpList.length > 0">
+      <h2>候補表示エリア</h2>
+      <div v-for="kouhoGrp in kouhoGrpList">
+        <h3 @click="delKouhoGrp(kouhoGrp)">{{ kouhoGrp.base }}</h3>
+        <ul>
+          <li v-for="kouho in kouhoGrp.list" @click="selKouho(kouhoGrp, kouho)" @mouseover="cardInfoHtml = kouho.html;">{{ kouho.name }}</li>
+        </ul>
+      </div>
     </div>
     
     <h2>一覧</h2>
