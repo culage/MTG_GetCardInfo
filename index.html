@@ -25,18 +25,7 @@
 </div>
 
 <h2>一覧</h2>
-
-<div id="save_slot">
-  <input type="text" v-model="saveTitle">
-  <button @click="save()">Save</button>
-  <select v-model="selectedSave">
-    <option disabled :value="null">select one</option>
-    <option v-for="save in saveList" :value="save">{{save.title}}</option>
-  </select>
-  <button @click="load()">Load</button>
-  <button @click="del()">Delete</button>
-</div>
-
+<save-slot v-model="deck"></save-slot>
 <div>合計: {{ deckAllNum }} 枚</div>
 <table border=1>
   <tr>
@@ -54,6 +43,60 @@
 </div>
 
 <script>
+Vue.component('save-slot', {
+  data     : function() { return {
+    SAVE_KEY: "save",
+    saveTitle: "",
+    selectedSave: null,
+    saveList: [], // { title, data }
+  }; },
+  props: ["value"],
+  template : `
+    <div>
+      <input type="text" v-model="saveTitle">
+      <button @click="save()">Save</button>
+      <select v-model="selectedSave">
+        <option disabled :value="null">select one</option>
+        <option v-for="save in saveList" :value="save">{{ save.title }}</option>
+      </select>
+      <button @click="load()">Load</button>
+      <button @click="del()">Delete</button>
+    </div>
+  `,
+  methods: {
+    save() {
+      if (this.saveTitle == "") { return; }
+      
+      var save;
+      if (this.saveList.filter(i => i.title == this.saveTitle).length == 0) {
+        save = {};
+        this.saveList.push(save);
+      } else {
+        save = this.saveList.filter(i => i.title == this.saveTitle)[0];
+      }
+      save.title = this.saveTitle;
+      save.data = JSON.stringify(this.value);
+      localStorage.setItem(this.SAVE_KEY, JSON.stringify(this.saveList) );
+      
+      this.selectedSave = save;
+    },
+    load() {
+      if (this.selectedSave == null) { return; }
+      this.saveTitle = this.selectedSave.title;
+      this.$emit('input', JSON.parse(this.selectedSave.data));
+    },
+    del() {
+      if (this.selectedSave == null) { return; }
+      this.saveList = this.saveList.filter(i => i !== this.selectedSave);
+      localStorage.setItem(this.SAVE_KEY, JSON.stringify(this.saveList) );
+      this.selectedSave = null;
+    },
+  },
+  mounted() {
+    this.saveList = JSON.parse(localStorage.getItem(this.SAVE_KEY)) ?? [];
+  },
+});
+
 var vue_app = new Vue({
   el: '#vue_app',
   data() { return {
@@ -68,12 +111,6 @@ var vue_app = new Vue({
     ],
     currSort: {col:"", asc:true},
     deck: [], // { num, name, cost, rarity, set }
-
-    SAVE_KEY: "save",
-    saveTitle: "",
-    selectedSave: null,
-    saveList: [], // { title, data }
-
   }; },
   computed: {
     deckAllNum() {
@@ -139,47 +176,7 @@ var vue_app = new Vue({
       }
       this.deck = this.deck.sort((i1, i2) => this.currSort.asc ? i1[col] > i2[col] : i1[col] < i2[col]);
     },
-
-
-
-    save() {
-      if (this.saveTitle == "") { return; }
-      
-      var save;
-      if (this.saveList.filter(i => i.title == this.saveTitle).length == 0) {
-        save = {};
-        this.saveList.push(save);
-      } else {
-        save = this.saveList.filter(i => i.title == this.saveTitle)[0];
-      }
-      save.title = this.saveTitle;
-      save.data = JSON.stringify(this.deck);
-      localStorage.setItem(this.SAVE_KEY, JSON.stringify(this.saveList) );
-      
-      this.selectedSave = save;
-    },
-    load() {
-      if (this.selectedSave == null) { return; }
-      this.saveTitle = this.selectedSave.title;
-      this.deck = JSON.parse(this.selectedSave.data);
-    },
-    del() {
-      if (this.selectedSave == null) { return; }
-      this.saveList = this.saveList.filter(i => i !== this.selectedSave);
-      localStorage.setItem(this.SAVE_KEY, JSON.stringify(this.saveList) );
-      this.selectedSave = null;
-    },
-
-
-
   },
-
-
-  mounted() {
-    this.saveList = JSON.parse(localStorage.getItem(this.SAVE_KEY)) ?? [];
-  },
-
-
 })
 </script>
 
