@@ -28,7 +28,7 @@
     </div>
     
     <h2>一覧</h2>
-    <save-slot v-model="deck"></save-slot>
+    <save-slot v-model="deck" :clear-value="[]"></save-slot>
     <div>合計: {{ deckAllNum }} 枚</div>
     <table border=1>
       <tr>
@@ -63,7 +63,7 @@ Vue.component('save-slot', {
     selectedSave: null,
     saveList: [], // { title, data }
   }; },
-  props: ["value"],
+  props: ["value", "clearValue"],
   template : `
     <div>
       <input type="text" v-model="saveTitle">
@@ -74,6 +74,7 @@ Vue.component('save-slot', {
       </select>
       <button @click="load()">Load</button>
       <button @click="del()">Delete</button>
+      <button @click="clear()" style="margin-left:1em;">Clear</button>
     </div>
   `,
   methods: {
@@ -103,6 +104,11 @@ Vue.component('save-slot', {
       this.saveList = this.saveList.filter(i => i !== this.selectedSave);
       localStorage.setItem(this.SAVE_KEY, JSON.stringify(this.saveList) );
       this.selectedSave = null;
+    },
+    clear() {
+      this.selectedSave = null;
+      this.saveTitle = "";
+      this.$emit('input', this.clearValue);
     },
   },
   mounted() {
