@@ -22,13 +22,13 @@
 ■todo
 ------------------------------
 
-API取得情報にセット略称exp/expantionを追加
+-API取得情報にセット略称exp/expantionを追加→存在しない
 *カード名一覧から各行を取得
+*候補はリンクから取得
 *セット名は削除してから読み込み" (XXX)"
 *0.5秒スリープとプログレスを入れる
-localStorageで保存 [xxxx  ][SAVE] [xxxxx▼][LOAD][DEL]
+*localStorageで保存 [xxxx  ][SAVE] [xxxxx▼][LOAD][DEL]
 右に情報を出す
-候補はリンクから取得
 jsonのインポート、エクスポート
 キャッシュを利用するようにする
 レアリティごとの枚数
