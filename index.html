@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <title>MTGカード名to詳細</title>
-<style></style>
+<link rel="Stylesheet" href="./lib/main.css" type="text/css">
 <script src="./lib/vue.min.js"></script>
 </head>
 <body>
@@ -12,33 +12,46 @@
 
 <h1>MTGカード名to詳細</h1>
 
-<h2>追加カード入力</h2>
-<textarea style="width:50em; height:5em;" v-model="searchTarget"></textarea><br>
-<button id="btnAdd" @click="search()" :disabled="progress">{{ progress ?? "検索" }}</button>
-
-<h2>候補表示エリア</h2>
-<div style="border:1px solid red;" v-for="kouhoGrp in kouhoGrpList">
-  <h3 @click="delKouhoGrp(kouhoGrp)">{{ kouhoGrp.base }}</h3>
-  <ul>
-    <li v-for="kouho in kouhoGrp.list" @click="selKouho(kouhoGrp, kouho)">{{ kouho.name }}</li>
-  </ul>
+<div style="display:flex">
+  <div id="input_area">
+    
+    <h2>追加カード入力</h2>
+    <textarea style="width:30em; height:5em;" v-model="searchTarget"></textarea><br>
+    <button id="btnAdd" @click="search()" :disabled="progress">{{ progress ?? "検索" }}</button>
+    
+    <h2>候補表示エリア</h2>
+    <div v-for="kouhoGrp in kouhoGrpList">
+      <h3 @click="delKouhoGrp(kouhoGrp)">{{ kouhoGrp.base }}</h3>
+      <ul>
+        <li v-for="kouho in kouhoGrp.list" @click="selKouho(kouhoGrp, kouho)" @mouseover="cardInfoHtml = kouho.html;">{{ kouho.name }}</li>
+      </ul>
+    </div>
+    
+    <h2>一覧</h2>
+    <save-slot v-model="deck"></save-slot>
+    <div>合計: {{ deckAllNum }} 枚</div>
+    <table border=1>
+      <tr>
+        <th>&nbsp;<!-- DEL Button --></th>
+        <th>枚数</th>
+        <th v-for="col in cols" @click="sort(col.name)">{{ col.disp }}</th>
+      </tr>
+      <tr v-for="card in deck">
+        <td><button @click="delCard(card)">DEL</button></td>
+        <td><input type="text" style="width:2em;text-align:right;" v-model.number="card.num"></td>
+        <td v-for="col in cols" @click="cardInfoHtml = card.html;">{{ card[col.name] }}</td>
+      </tr>
+    </table>
+    
+  </div>
+  <div id="card_info_area" style="margin-left:30px">
+  
+    <h2>カード情報</h3>
+    <div v-html="cardInfoHtml"></div>
+  
+  </div>
 </div>
 
-<h2>一覧</h2>
-<save-slot v-model="deck"></save-slot>
-<div>合計: {{ deckAllNum }} 枚</div>
-<table border=1>
-  <tr>
-    <th>&nbsp;<!-- DEL Button --></th>
-    <th>枚数</th>
-    <th v-for="col in cols" @click="sort(col.name)">{{ col.disp }}</th>
-  </tr>
-  <tr v-for="card in deck">
-    <td><button @click="delCard(card)">DEL</button></td>
-    <td><input type="text" style="width:2em;text-align:right;" v-model.number="card.num"></td>
-    <td v-for="col in cols">{{ card[col.name] }}</td>
-  </tr>
-</table>
 
 </div>
 
@@ -111,6 +124,7 @@ var vue_app = new Vue({
     ],
     currSort: {col:"", asc:true},
     deck: [], // { num, name, cost, rarity, set }
+    cardInfoHtml: "",
   }; },
   computed: {
     deckAllNum() {
@@ -142,7 +156,7 @@ var vue_app = new Vue({
           this.deck.push({num:searchItem.num, ...result.detail});
         } else {
           // 候補追加
-          var kouhoGrp = {num:searchItem.num, base:name, list:result.cards};
+          var kouhoGrp = {num:searchItem.num, base:searchItem.name, list:result.cards};
           this.kouhoGrpList.push(kouhoGrp);
         }
         await sleep(500);

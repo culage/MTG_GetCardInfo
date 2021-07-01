@@ -11,9 +11,15 @@ server.on('request', async function(req, res) {
 		return;
 	}
 	if (req.url == "/lib/vue.min.js") {
-		var vueScript = require('fs').readFileSync('./lib/vue.min.js');
+		var content = require('fs').readFileSync('./lib/vue.min.js');
 		res.writeHead(200,{'Content-Type':'text/javascript'});
-		res.end(vueScript);
+		res.end(content);
+		return;
+	}
+	if (req.url == "/lib/main.css") {
+		var content = require('fs').readFileSync('./lib/main.css');
+		res.writeHead(200,{'Content-Type':'text/css'});
+		res.end(content);
 		return;
 	}
 	if (req.url.startsWith("/get_card?q=")) {
