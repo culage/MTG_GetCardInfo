@@ -134,6 +134,9 @@ var vue_app = new Vue({
   methods: {
     parseSearchTarget(text) {
       return text.split("\n")
+        .map(line => line
+          .replace(/^(Deck|デッキ)$/, "")
+          .replace(/ \([A-Z0-9]{3}\) [0-9]+$/, ""))
         .filter(line => line.trim() != "")
         .map(line => {
           var matches = line.match(/([0-9]+) +(.*)/);
