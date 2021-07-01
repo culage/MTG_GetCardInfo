@@ -161,7 +161,7 @@ var vue_app = new Vue({
   computed: {
     rarityNum() {
       var result = {};
-      for (var card of this.deck) {
+      for (var card of [...this.deck].sort((c1,c2)=>c1.rarity > c2.rarity)) { // deck.sort()はdeck自身を変更するのでシャローコピーを作ってやらないと無限にこの処理が呼ばれる
         if (result[card.rarity] == undefined) { result[card.rarity] = 0; }
         result[card.rarity] += card.num;
       }
@@ -169,7 +169,7 @@ var vue_app = new Vue({
     },
     setNum() {
       var result = {};
-      for (var card of this.deck) {
+      for (var card of [...this.deck].sort((c1,c2)=>c1.set > c2.set)) {
         if (result[card.set] == undefined) { result[card.set] = 0; }
         result[card.set] += card.num;
       }
@@ -212,9 +212,12 @@ var vue_app = new Vue({
       var searchList = this.parseSearchTarget(this.searchTarget);
       var sleep = (w) => new Promise(resolve => setTimeout(resolve, w));
       
+      var firstLoop = true;
       var progressCnt = 0;
       for (var searchItem of searchList) {
-        this.progress = `${progressCnt++} / ${searchList.length}`
+        if (!firstLoop) { await sleep(500); }
+        firstLoop = false;
+        
         var result = await this.getCard(searchItem.name);
         if (result.type == "detail") {
           // デッキ追加
@@ -224,7 +227,7 @@ var vue_app = new Vue({
           var kouhoGrp = {num:searchItem.num, base:searchItem.name, list:result.cards};
           this.kouhoGrpList.push(kouhoGrp);
         }
-        await sleep(500);
+        this.progress = `${++progressCnt} / ${searchList.length}`
       }
       this.progress = null;
     },
