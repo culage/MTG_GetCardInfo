@@ -14,7 +14,7 @@
 
 <h2>追加カード入力</h2>
 <textarea style="width:50em; height:5em;" v-model="searchTarget"></textarea><br>
-<button id="btnAdd" @click="search()">検索</button>
+<button id="btnAdd" @click="search()" :disabled="progress">{{ progress ?? "検索" }}</button>
 
 <h2>候補表示エリア</h2>
 <div style="border:1px solid red;" v-for="kouhoGrp in kouhoGrpList">
@@ -46,6 +46,7 @@ var vue_app = new Vue({
   el: '#vue_app',
   data() { return {
     searchTarget: "",
+    progress: null,
     kouhoGrpList: [], // {num, base, list:[kouhoObj, kouhoObj]}
     cols: [
       {name:"name"  , disp:"カード名"  },
@@ -62,27 +63,34 @@ var vue_app = new Vue({
     }
   },
   methods: {
+    parseSearchTarget(text) {
+      return text.split("\n")
+        .filter(line => line.trim() != "")
+        .map(line => {
+          var matches = line.match(/([0-9]+) +(.*)/);
+          return {
+            num: matches ? Number(matches[1]) : 0,
+            name: matches ? matches[2] : line,
+          };
+        });
+    },
     async search() {
-      // ★複数追加
-      var num, name;
-      var matches = this.searchTarget.match(/([0-9]+) +(.*)/);
-      if (matches != null) {
-        num  = Number(matches[1]);
-        name = matches[2];
-      } else {
-        num  = 0;
-        name = this.searchTarget;
-      }
+      var searchList = this.parseSearchTarget(this.searchTarget);
       
-      var result = await this.getCard(name);
-      if (result.type == "detail") {
-        // デッキ追加
-        this.deck.push({num, ...result.detail});
-      } else {
-        // 候補追加
-        var kouhoGrp = {num, base:name, list:result.cards};
-        this.kouhoGrpList.push(kouhoGrp);
+      var progressCnt = 0;
+      for (var searchItem of searchList) {
+        this.progress = `${progressCnt++} / ${searchList.length}`
+        var result = await this.getCard(searchItem.name);
+        if (result.type == "detail") {
+          // デッキ追加
+          this.deck.push({num:searchItem.num, ...result.detail});
+        } else {
+          // 候補追加
+          var kouhoGrp = {num:searchItem.num, base:name, list:result.cards};
+          this.kouhoGrpList.push(kouhoGrp);
+        }
       }
+      this.progress = null;
     },
     async getCard(name) {
       var response = await fetch("/get_card?q=" + encodeURIComponent(name));
