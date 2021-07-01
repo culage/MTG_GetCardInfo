@@ -44,7 +44,7 @@
         <th class="dc" v-for="col in cols" @click="sort(col.sortKey)">{{ col.disp }}</th>
       </tr>
       <tr v-for="card in dispDeck">
-        <td class="lc"><button @click="delCard(card)" class="row-button">DEL</button></td>
+        <td class="lc"><button @click="delCard(card.baseData)" class="row-button">DEL</button></td>
         <td class="lc"><input type="text" style="width:2em;text-align:right;" v-model.number="card.num"></td>
         <td class="lc" v-for="col in cols" @click="cardInfoHtml = card.html;" v-html="card[col.name]"></td>
       </tr>
@@ -170,6 +170,7 @@ var vue_app = new Vue({
       return this.deck.map(i => ({
         dispName:i.name.replace(" // ", " // <br>"),
         dispCost:i.cost.replace(" // ", " // <br>"),
+        baseData: i,
         ...i
       }));
     },
