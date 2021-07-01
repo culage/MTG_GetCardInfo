@@ -32,14 +32,14 @@
     <div>合計: {{ deckAllNum }} 枚</div>
     <table border=1>
       <tr>
-        <th>&nbsp;<!-- DEL Button --></th>
-        <th>枚数</th>
-        <th v-for="col in cols" @click="sort(col.name)">{{ col.disp }}</th>
+        <th class="dc">&nbsp;<!-- DEL Button --></th>
+        <th class="dc">枚数</th>
+        <th class="dc" v-for="col in cols" @click="sort(col.name)">{{ col.disp }}</th>
       </tr>
       <tr v-for="card in deck">
-        <td><button @click="delCard(card)">DEL</button></td>
-        <td><input type="text" style="width:2em;text-align:right;" v-model.number="card.num"></td>
-        <td v-for="col in cols" @click="cardInfoHtml = card.html;">{{ card[col.name] }}</td>
+        <td class="lc"><button @click="delCard(card)">DEL</button></td>
+        <td class="lc"><input type="text" style="width:2em;text-align:right;" v-model.number="card.num"></td>
+        <td class="lc" v-for="col in cols" @click="cardInfoHtml = card.html;">{{ card[col.name] }}</td>
       </tr>
     </table>
     
