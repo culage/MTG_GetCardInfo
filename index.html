@@ -76,6 +76,7 @@ var vue_app = new Vue({
     },
     async search() {
       var searchList = this.parseSearchTarget(this.searchTarget);
+      var sleep = (w) => new Promise(resolve => setTimeout(resolve, w));
       
       var progressCnt = 0;
       for (var searchItem of searchList) {
@@ -89,6 +90,7 @@ var vue_app = new Vue({
           var kouhoGrp = {num:searchItem.num, base:name, list:result.cards};
           this.kouhoGrpList.push(kouhoGrp);
         }
+        await sleep(500);
       }
       this.progress = null;
     },
