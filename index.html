@@ -29,7 +29,11 @@
     
     <h2>一覧</h2>
     <save-slot v-model="deck" :clear-value="[]"></save-slot>
-    <div>合計: {{ deckAllNum }} 枚</div>
+    <div>
+      合計: {{ Object.entries(deckNum).reduce((sum, [key, value]) => sum + value, 0) }} 枚
+      &nbsp;&nbsp;
+      <span v-for="(value, key) in deckNum">{{ key }}: {{ value }} 枚　</span>
+    </div>
     <table border=1>
       <tr>
         <th class="dc">&nbsp;<!-- DEL Button --></th>
@@ -133,8 +137,13 @@ var vue_app = new Vue({
     cardInfoHtml: "",
   }; },
   computed: {
-    deckAllNum() {
-      return this.deck.reduce((sum, card) => sum + (!isNaN(card.num) ? card.num : 0), 0);
+    deckNum() {
+      var result = {};
+      for (var card of this.deck) {
+        if (result[card.rarity] == undefined) { result[card.rarity] = 0; }
+        result[card.rarity] += card.num;
+      }
+      return result;
     },
     dispDeck() {
       return this.deck.map(i => ({
