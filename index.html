@@ -31,10 +31,11 @@
     
     <h2>一覧</h2>
     <save-slot v-model="deck" :clear-value="[]"></save-slot>
-    <div>
+    <div style="margin:3px 0">
       合計: {{ Object.entries(deckNum).reduce((sum, [key, value]) => sum + value, 0) }} 枚
       &nbsp;&nbsp;
       <span v-for="(value, key) in deckNum">{{ key }}: {{ value }} 枚　</span>
+      <button @click="isShowDialog=true">Export</button>
     </div>
     <table border=1>
       <tr>
@@ -58,6 +59,23 @@
   </div>
 </div>
 
+<div id='listDialog' v-if="isShowDialog"
+    style='
+    display: flex;
+    flex-flow: column;
+    position: fixed;
+    height: 80%;
+    width: 80%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align:center;
+    background-color:gray;'>
+
+  <div style="flex:1;"><textarea v-model="exportText" style="margin:10px; width:calc(100% - 23px); height:calc(100% - 10px);"></textarea></div>
+  <div style="flex:0;"><button @click="isShowDialog=false" style="margin:20px;">Close</button></div>
+  
+</div>
 
 </div>
 
@@ -137,6 +155,7 @@ var vue_app = new Vue({
     currSort: {col:"", asc:true},
     deck: [], // { num, name, cost, rarity, set }
     cardInfoHtml: "",
+    isShowDialog: false,
   }; },
   computed: {
     deckNum() {
@@ -153,6 +172,15 @@ var vue_app = new Vue({
         dispCost:i.cost.replace(" // ", " // <br>"),
         ...i
       }));
+    },
+    exportText() {
+      var result = "";
+      for(var card of this.deck) {
+        result += card.num + " ";
+        result += card.name.replace(/\/.*/, "");
+        result += "\n";
+      }
+      return result;
     },
   },
   methods: {
