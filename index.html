@@ -227,13 +227,13 @@ var vue_app = new Vue({
       this.kouhoGrpList = this.kouhoGrpList.filter(i => i !== kouhoGrp);
     },
     async selKouho(kouhoGrp, kouho) {
+      this.delKouhoGrp(kouhoGrp);
       var result = await this.getCard( kouho.url );
       if (result.type != "detail") {
         alert("err"); console.log(result);
         return;
       }
       this.deck.push({num:kouhoGrp.num, ...result.detail});
-      this.delKouhoGrp(kouhoGrp);
     },
     delCard(card) {
       this.deck = this.deck.filter(i => i !== card);
