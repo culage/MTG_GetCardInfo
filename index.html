@@ -32,10 +32,11 @@
     <h2>一覧</h2>
     <save-slot v-model="deck" :clear-value="[]"></save-slot>
     <div style="margin:3px 0">
-      合計: {{ Object.entries(deckNum).reduce((sum, [key, value]) => sum + value, 0) }} 枚
+      合計: {{ Object.entries(rarityNum).reduce((sum, [key, value]) => sum + value, 0) }} 枚
       &nbsp;&nbsp;
-      <span v-for="(value, key) in deckNum">{{ key }}: {{ value }} 枚　</span>
-      <button @click="isShowDialog=true">Export</button>
+      <button @click="isShowDialog=true">Export</button><br>
+      <span v-for="(value, key) in rarityNum">{{ key }}: {{ value }} 枚　</span><br>
+      <span v-for="(value, key) in setNum">{{ key }}: {{ value }} 枚　</span>
     </div>
     <table border=1>
       <tr>
@@ -158,11 +159,19 @@ var vue_app = new Vue({
     isShowDialog: false,
   }; },
   computed: {
-    deckNum() {
+    rarityNum() {
       var result = {};
       for (var card of this.deck) {
         if (result[card.rarity] == undefined) { result[card.rarity] = 0; }
         result[card.rarity] += card.num;
+      }
+      return result;
+    },
+    setNum() {
+      var result = {};
+      for (var card of this.deck) {
+        if (result[card.set] == undefined) { result[card.set] = 0; }
+        result[card.set] += card.num;
       }
       return result;
     },
