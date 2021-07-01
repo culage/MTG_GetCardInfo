@@ -100,8 +100,7 @@ var vue_app = new Vue({
       this.kouhoGrpList = this.kouhoGrpList.filter(i => i !== kouhoGrp);
     },
     async selKouho(kouhoGrp, kouho) {
-      // ★部分一致するカード名の場合もあるので、URLから取るようにする必要あり
-      var result = await this.getCard( kouho.name.replace(/ \/\/ .*/, "") );
+      var result = await this.getCard( kouho.url );
       if (result.type != "detail") {
         alert("err"); console.log(result);
         return;

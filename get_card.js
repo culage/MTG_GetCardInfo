@@ -2,7 +2,10 @@ const fetch = require("node-fetch");
 const { JSDOM } = require("jsdom");
 
 exports.GetCard = async function (encName) {
-	const url = "http://whisper.wisdom-guild.net/search.php?format=standard&q=" + encName;
+	const isUrlArgs = decodeURIComponent(encName).startsWith("http");
+	const url = isUrlArgs ? 
+	            decodeURIComponent(encName) :
+	            "http://whisper.wisdom-guild.net/search.php?format=standard&q=" + encName;
 	const res = await fetch(url);
 	const html = await res.text();
 	const dom = new JSDOM(html);
