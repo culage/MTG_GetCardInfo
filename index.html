@@ -46,7 +46,7 @@
       </tr>
       <tr v-for="card in dispDeck">
         <td class="lc"><button @click="delCard(card.baseData)" class="row-button">DEL</button></td>
-        <td class="lc"><input type="text" style="width:2em;text-align:right;" v-model.number="card.num"></td>
+        <td class="lc"><input type="text" style="width:2em;text-align:right;" v-model.number="card.baseData.num"></td>
         <td class="lc" v-for="col in cols" @click="cardInfoHtml = card.html;" v-html="card[col.name]"></td>
       </tr>
     </table>
