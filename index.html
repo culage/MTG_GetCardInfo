@@ -17,7 +17,8 @@
     
     <h2>追加カード入力</h2>
     <textarea style="width:30em; height:5em;" v-model="searchTarget"></textarea><br>
-    <button id="btnAdd" @click="search()" :disabled="progress">{{ progress ?? "検索" }}</button>
+    <button id="btnAdd" @click="search()" :disabled="progress">{{ progress ?? "検索" }}</button>　
+    <input type="checkbox" v-model="standardOnly">Standard Only
     
     <div v-if="kouhoGrpList.length > 0">
       <h2>候補表示エリア</h2>
@@ -145,6 +146,7 @@ var vue_app = new Vue({
   el: '#vue_app',
   data() { return {
     searchTarget: "",
+    standardOnly: true,
     progress: null,
     kouhoGrpList: [], // {num, base, list:[kouhoObj, kouhoObj]}
     cols: [
@@ -232,7 +234,8 @@ var vue_app = new Vue({
       this.progress = null;
     },
     async getCard(name) {
-      var response = await fetch("/get_card?q=" + encodeURIComponent(name));
+      var url = "/get_card?q=" + encodeURIComponent(name) + (this.standardOnly ? "&format=standard" : "");
+      var response = await fetch(url);
       return await response.json();
     },
     delKouhoGrp(kouhoGrp) {

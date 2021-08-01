@@ -22,10 +22,10 @@ server.on('request', async function(req, res) {
 		res.end(content);
 		return;
 	}
-	if (req.url.startsWith("/get_card?q=")) {
+	if (req.url.startsWith("/get_card?")) {
 		console.log(req.url);
-		var encEame = req.url.match(/(?<=q=).*/)[0];
-		var ret = await whisper.GetCard(encEame);
+		var param = req.url.substr("/get_card?".length);
+		var ret = await whisper.GetCard(param);
 		res.writeHead(200,{'Content-Type':'application/json'});
 		res.end(JSON.stringify(ret));
 		return;
